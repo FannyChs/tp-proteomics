@@ -132,34 +132,42 @@ df = pandas.read_csv()
 
 Quel est le type de l'objet `df`?
 ```
-
+Un dataframe ie une table de données structurée.
 ```
 
 ##### Descriptions d'une table de données
 Que permettent les méthodes suivantes?
 ###### df.shape
 ```
+Obtenir les dimensions du df : ligne x colonne.
 ```
 ###### df.head()
 ```
+Otenir un aperçu du début du df.
 ```
 ###### df.tail()
 ```
+Otenir un aperçu de la fin du df.
 ```
 ###### df.columns
 ```
+Obtenir le nom des différentes colonnes du df.
 ```
 ###### df.dtypes
 ```
+Otenir le type de données pour chaque colonne.
 ```
 ###### df.info
 ```
+Un combiné des fonctions précédentes : donne un résumé complet du df (dimensions, colonnes, début, fin)
 ```
 ###### df.describe()
 ```
+Obtenir un résumé statistique des valeurs des colonnes numériques.
 ```
 ###### df.dropna()
 ```
+Supprimer les lignes ou colonnes avec valeurs manquantes.
 ```
 
 ##### Accès aux éléments d'une table de données
@@ -169,6 +177,9 @@ values = df[['Description', 'Gene Symbol']]
 ```
 
 Quel est le type de `values` ?
+```
+Un df.
+```
 
 Verifiez si certaines méthodes de `DataFrame` lui sont applicables.
 Ce type supporte l'accès par indice et les slice `[a:b]`
@@ -179,17 +190,21 @@ On peut accéder aux valeurs du DataFrame via des indices ou plages d'indice. La
 Il y a différentes manières de le faire, l'utilisation de `.iloc[slice_ligne,slice_colonne]` constitue une des solutions les plus simples. N'oublions pas que shape permet d'obtenir les dimensions (lignes et colonnes) du DataFrame.
 ###### Acceder aux cinq premières lignes de toutes les colonnes
 ```python
-
+values.iloc[:5]
 ```
 
 ###### Acceder à toutes les lignes de la dernière colonne
 ```python
-
+values.iloc[:, -1]
 ```
 
 ###### Acceder aux cinq premières lignes des colonnes 0, 2 et 3
 ```python
-
+df.iloc[:5, [0,2,3]]
+```
+###### Acceder aux lignes 12 à 15 des colonnes 3 et 7
+```python
+df.iloc[12:16, [3, 7]]
 ```
 
 ##### Conversion de type
@@ -236,35 +251,74 @@ df.loc[ df['Gene Symbol'].isin(['fadR', 'arcA'] ) ]
 ##### 1. Chargez le contenu du fichier `data/TCL_wt1.tsv` dans un notebook en eliminant les lignes porteuses de valeurs numériques aberrantes
 
 ##### 2. Representez par un histogramme les valeurs de `Log2 Corrected Abundance Ratio`
+```python
+plt.figure(figsize=(8, 5))  # Taille de la figure
+plt.hist(
+    df['Log2 Corrected Abundance Ratio'].dropna(),  # Supprime les NaN
+    bins=30,  # Nombre de barres
+    edgecolor='black',  # Bordure des barres
+    alpha=0.7  # Transparence
+)
+plt.title("Histogramme des Log2 Corrected Abundance Ratio", fontsize=12)
+plt.xlabel("Log2 (Ratio d'abondance)", fontsize=10)
+plt.ylabel("Nombre de protéines", fontsize=10)
+plt.grid(True, alpha=0.3)  # Grille légère
 
-<!-- ##### 3. A partir de cette échantillon de ratio d'abondance,  estimez la moyenne <img src="https://render.githubusercontent.com/render/math?math=\mu"> et l'ecart-type <img src="https://render.githubusercontent.com/render/math?math=\sigma"> d'une loi normale. -->
-
-##### 3. A partir de cette échantillon de ratio d'abondance,  estimez la moyenne $\mu$ et l'ecart-type $\sigma$ d'une loi normale.
+plt.savefig('figures/histogramme_des_log2_corrected_abundance_ration.png', dpi=300, bbox_inches='tight')  
+plt.show()
+plt.close() 
 ```
 
+##### 3. A partir de cette échantillon de ratio d'abondance,  estimez la moyenne $\mu$ et l'ecart-type $\sigma$ d'une loi normale.
+```python
+# Extraire la colonne 'Log2 Corrected Abundance Ratio' et supprimer les NaN
+log2_ratios = df['Log2 Corrected Abundance Ratio'].dropna()
 
+# Calculer la moyenne (μ) et l'écart-type (σ)
+mu = np.mean(log2_ratios)  # Moyenne empirique
+sigma = np.std(log2_ratios, ddof=1)  # Écart-type empirique (ddof=1 pour une estimation non biaisée)
+
+print(f"Estimation de μ (moyenne) : {mu:.4f}")
+print(f"Estimation de σ (écart-type) : {sigma:.4f}")
+```
+```
+Estimation de μ (moyenne) : -0.6467
+Estimation de σ (écart-type) : 0.4672
 ```
 
 ##### 4. Superposez la densité de probabilité de cette loi sur l'histogramme. Attention, la densité de probabilité devra être mis à l'echelle de l'histogramme (cf ci-dessous)
 
 
 ```python
-# _ est le vecteur des valeurs d'abondance
+# log2_ratios est le vecteur des valeurs d'abondance
 fig, ax = plt.subplots()
-hist = ax.hist(_, bins=100) # draw histogram
-x = np.linspace(min(_), max(_), 100) # generate PDF domain points
+hist = ax.hist(log2_ratios, bins=100, label='Distribution des données') # draw histogram
+x = np.linspace(min(log2_ratios), max(log2_ratios), 100) # generate PDF domain points
 dx = hist[1][1] - hist[1][0] # Get single value bar height
-scale = len(_)*dx # scale accordingly
-ax.plot(x, norm.pdf(x, mu, sigma)*scale) # compute theoritical PDF and draw it
+scale = len(log2_ratios)*dx # scale accordingly
+ax.plot(x, norm.pdf(x, mu, sigma)*scale, label=f'Loi normale (μ={mu:.2f}, σ={sigma:.2f})') # compute theoritical PDF and draw it
+
+ax.set_title("Superposition de l'histogramme et de la densité normale", fontsize=12)
+ax.set_xlabel("Log2 (Ratio d'abondance)", fontsize=10)
+ax.set_ylabel("Nombre d'observations", fontsize=10)
+ax.legend()
+ax.grid(True, alpha=0.3)
+
+plt.savefig('figures/superposition_histogramme_des_log2_corrected_abundance_ration_loi_normale.png', dpi=300, bbox_inches='tight')  
+plt.show()
+plt.close()
 ```
 
-![Histogramme à inserez ici](histogram_log2FC.png "Title")
+<img src="superposition_histogramme_des_log2_corrected_abundance_ration_loi_normale.png"
+     alt="Histogramme des ratios Log2 et densité normale"
+     width="600" />
+
+**Figure 1** : Histogramme des Log2 Corrected Abundance Ratio et densité de probabilité normale
 
 ##### 5. Quelles remarques peut-on faire à l'observation de l'histogramme et de la loi théorique?
 
 ```
-
-
+La courbe orange représentant la loi normale épouse globalement la distribution des données. Cependant, on observe une légère asymétrie à droite suggérant la présence de protéine avec des ratio élevés.
 ```
 
 #### Construction d'un volcano plot
@@ -277,7 +331,11 @@ Sont condidérées comme surabondantes les proteines remplissant ces deux critè
 * $\text{Log}_2(\text{abundance ratio})\gt\mu%2B\sigma$
 * $\text{p-value}<0.001$
 
-![Volcano plot + quadrant à inserez ici](histogram_log2FC.png "Title")
+<img src="volcano_plot_des_log2_corrected_abundance_ratio_log10_pval_adj-1.png"
+     alt="Histogramme des ratios Log2 et densité normale"
+     width="600" />
+
+**Figure 2** : Volcano plot du -Log10 (Adj. P-value) vs Log2 (Corrected Abundance Ratio)
 
 ### Analyse Fonctionelle de pathway
 
@@ -286,10 +344,14 @@ Nous allons implementer une approche ORA (Over Representation Analysis) naive.
 ##### 1. Retrouvez les entrées du fichier TSV des protéines surabondantes
 
 Quelles sont leurs identifiants UNIPROT ?
-``` 
+```python
+uniprot_ids = df.loc[
+    (df['Log2 Corrected Abundance Ratio'] > ratio_threshold) &
+    (df['-LOG10 Adj.P-val'] > pval_threshold),
+    'Accession'
+]
 
-
-
+uniprot_ids.to_csv('uniprot_ids_surabondantes.txt', index=False, header=False)
 ```
 
 #### 2. Listez les termes GO portés par ces protéines surabondates
@@ -346,7 +408,55 @@ Ce dictionnaire pourrait être de la forme suivante:
   }
 ```
 Vous implémenterez la construction de ce dictionnaire et ainsi stockerez, pour la suite de l'analyse, les représentations des termes GO parmi les protéines surabondantes.
+```python
+def build_go_dictionary(xml_file, accession_list):
+    """
+    Construit un dictionnaire des termes GO pour une liste d'accessions de protéines.
 
+    Args:
+        xml_file (str): Chemin vers le fichier XML UniProt
+        accession_list (list): Liste des accessions des protéines surabondantes
+
+    Returns:
+        dict: Dictionnaire structuré des termes GO
+    """
+    go_dict = {}
+
+    for accession in accession_list:
+        # Récupérer les termes GO pour cette protéine
+        go_terms = getAccessionGOTerms(xml_file, accession)
+
+        for go_id, go_name in go_terms:
+            # Si le terme GO n'existe pas encore dans le dictionnaire, l'initialiser
+            if go_id not in go_dict:
+                go_dict[go_id] = {
+                    'ID': go_id,
+                    'name': go_name,
+                    'carried_by': []
+                }
+
+            # Ajouter l'accession à la liste des protéines portant ce terme GO
+            if accession not in go_dict[go_id]['carried_by']:
+                go_dict[go_id]['carried_by'].append(accession)
+
+    return go_dict
+
+# Exemple d'utilisation:
+# 1. Lire les accessions des protéines surabondantes depuis le fichier
+with open('uniprot_ids_surabondantes.txt', 'r') as f:
+    accessions = [line.strip() for line in f]
+
+# 2. Construire le dictionnaire des termes GO
+go_dictionary = build_go_dictionary("./data/uniprot-proteome_UP000000625.xml", accessions)
+
+# 3. Afficher le résultat (ou l'enregistrer dans un fichier)
+import json
+print(json.dumps(go_dictionary, indent=2))
+
+# Pour sauvegarder dans un fichier JSON:
+with open('go_terms_surabondantes.json', 'w') as f:
+    json.dump(go_dictionary, f, indent=2)
+```
 #### 3. Obtention des paramètres du modèle
 
 Nous évaluerons la significativité de la présence de tous les termes GO portés par les protéines surabondantes à l'aide d'un [modèle hypergéometrique](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.hypergeom.html).
@@ -357,10 +467,12 @@ Completer le tableau ci-dessous avec les quantités vous semblant adéquates pou
 
 | Symboles | Paramètres | Quantités Biologiques |
 | --- | --- | --- |
-| k | nombre de succès observés| |
-| K | nombre de succès possibles| |
-| n | nombre d'observations| |
-| N | nombre d'elements observables| |
+| k | nombre de succès observés| 38 |
+| K | nombre de succès possibles| 519 |
+| n | nombre d'observations| 177 |
+| N | nombre d'elements observables| 3931 |
+
+Exemple avec le terme 'GO:0005737'.
 
 #### 4. Calcul de l'enrichissement en fonctions biologiques
 
