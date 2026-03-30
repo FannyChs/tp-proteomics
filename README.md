@@ -410,24 +410,13 @@ Ce dictionnaire pourrait être de la forme suivante:
 Vous implémenterez la construction de ce dictionnaire et ainsi stockerez, pour la suite de l'analyse, les représentations des termes GO parmi les protéines surabondantes.
 ```python
 def build_go_dictionary(xml_file, accession_list):
-    """
-    Construit un dictionnaire des termes GO pour une liste d'accessions de protéines.
-
-    Args:
-        xml_file (str): Chemin vers le fichier XML UniProt
-        accession_list (list): Liste des accessions des protéines surabondantes
-
-    Returns:
-        dict: Dictionnaire structuré des termes GO
-    """
+    
     go_dict = {}
 
     for accession in accession_list:
-        # Récupérer les termes GO pour cette protéine
         go_terms = getAccessionGOTerms(xml_file, accession)
 
         for go_id, go_name in go_terms:
-            # Si le terme GO n'existe pas encore dans le dictionnaire, l'initialiser
             if go_id not in go_dict:
                 go_dict[go_id] = {
                     'ID': go_id,
@@ -435,25 +424,22 @@ def build_go_dictionary(xml_file, accession_list):
                     'carried_by': []
                 }
 
-            # Ajouter l'accession à la liste des protéines portant ce terme GO
             if accession not in go_dict[go_id]['carried_by']:
                 go_dict[go_id]['carried_by'].append(accession)
 
     return go_dict
 
-# Exemple d'utilisation:
-# 1. Lire les accessions des protéines surabondantes depuis le fichier
+# Lecture des accessions des protéines surabondantes depuis le fichier
 with open('uniprot_ids_surabondantes.txt', 'r') as f:
     accessions = [line.strip() for line in f]
 
-# 2. Construire le dictionnaire des termes GO
+# Construction du dictionnaire des termes GO
 go_dictionary = build_go_dictionary("./data/uniprot-proteome_UP000000625.xml", accessions)
 
-# 3. Afficher le résultat (ou l'enregistrer dans un fichier)
+# Enregistrement du résultat
 import json
 print(json.dumps(go_dictionary, indent=2))
 
-# Pour sauvegarder dans un fichier JSON:
 with open('go_terms_surabondantes.json', 'w') as f:
     json.dump(go_dictionary, f, indent=2)
 ```
