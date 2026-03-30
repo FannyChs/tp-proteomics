@@ -309,7 +309,7 @@ plt.show()
 plt.close()
 ```
 
-<img src="superposition_histogramme_des_log2_corrected_abundance_ration_loi_normale.png"
+<img src="/figure/superposition_histogramme_des_log2_corrected_abundance_ration_loi_normale.png"
      alt="Histogramme des ratios Log2 et densité normale"
      width="600" />
 
@@ -331,7 +331,7 @@ Sont condidérées comme surabondantes les proteines remplissant ces deux critè
 * $\text{Log}_2(\text{abundance ratio})\gt\mu%2B\sigma$
 * $\text{p-value}<0.001$
 
-<img src="volcano_plot_des_log2_corrected_abundance_ratio_log10_pval_adj-1.png"
+<img src="/figure/volcano_plot_des_log2_corrected_abundance_ratio_log10_pval_adj-1.png"
      alt="Histogramme des ratios Log2 et densité normale"
      width="600" />
 
