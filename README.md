@@ -309,7 +309,7 @@ plt.show()
 plt.close()
 ```
 
-![Description](figures/superposition_histogramme_des_log2_corrected_abundance_ration_loi_normale.png)
+![Description](figures/superposition_histogramme_des_log2_corrected_abundance_ratio_loi_normale.png)
 
 **Figure 1** : Histogramme des Log2 Corrected Abundance Ratio et densité de probabilité normale
 
@@ -329,7 +329,7 @@ Sont condidérées comme surabondantes les proteines remplissant ces deux critè
 * $\text{Log}_2(\text{abundance ratio})\gt\mu%2B\sigma$
 * $\text{p-value}<0.001$
 
-![Description](/figures/volcano_plot_des_log2_corrected_abundance_ratio_log10_pval_adj-1.png)
+![Description](/figures/volcano_plot_des_log2_corrected_abundance_ratio_log10_pval_adj.png)
 
 **Figure 2** : Volcano plot du -Log10 (Adj. P-value) vs Log2 (Corrected Abundance Ratio)
 
